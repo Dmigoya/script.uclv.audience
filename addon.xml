@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.addon.audience" name="Audience in cuban TV" version="1.0.0" provider-name="Audience">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <!--<extension point="xbmc.service" library="./addon.py"/>-->
+  <extension point="xbmc.python.script" library="./addon.py"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Your add-on's summary</summary>
+    <description lang="en_GB">Your add-on's description</description>
+    <disclaimer lang="en_GB"></disclaimer>
+    <language>en</language> <!-- language of the content the add-on provides, omit if the add-on does not provide any content -->
+    <platform>all</platform>
+    <license>GPL-2.0-or-later</license>
+    <forum>https://forum.kodi.tv/showthread.php?tid=xxxx</forum> <!-- may be omitted -->
+    <website>http://myplugin.com</website> <!-- URL of the website that supplies the content, or the website for your plugin; may be omitted. -->
+    <email>you@youremail.com</email> <!-- may be omitted -->
+    <source>http://github.com/you/plugin.addon.id</source>
+    <news>v1.2.3 (01/02/2013)
+      [new] some new feature
+      [fix] some fix
+    </news>
+    <assets>
+        <icon>resources/icon.png</icon>
+        <fanart>resources/fanart.jpg</fanart>
+        <banner></banner> <!-- optional -->
+        <clearlogo>resources/icon.png</clearlogo> <!-- optional -->
+        <screenshot></screenshot> <!-- optional, max. 10 -->
+    </assets>
+  </extension>
+</addon>
