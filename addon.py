@@ -41,6 +41,9 @@ def dialogYesNoRemovedFileData(tittle, message):
     else:
         return False
 
+def dialogInput(tittle):
+    d = xbmcgui.Dialog()
+    return d.input(tittle)
 
 # Data
 def readConfigs():
