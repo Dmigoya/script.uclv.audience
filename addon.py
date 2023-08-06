@@ -5,6 +5,7 @@ import requests
 import os
 from datetime import datetime
 import shutil
+import uuid
 
 # globals
 configPath = '/home/davex/.kodi/addons/script.uclv.audience/config.json'
@@ -92,6 +93,7 @@ def removeDataFile():
     if os.path.exists(path):
         os.remove(path)
 
+
 def existDataFile():
     configs = readConfigs()
     path = configs['master_path'] + configs['data_name_file']
@@ -132,6 +134,10 @@ def findUSB():
     return False, '', ''
 
 
+def getUUID():
+    return str(uuid.getnode())
+
+
 # API
 def getTokenJWT():
     configs = readConfigs()
@@ -152,6 +158,7 @@ def getTokenJWT():
         return response.json()['token']
     else:
         return ''
+
 
 def sendData():
     if not existDataFile():
@@ -180,7 +187,6 @@ def sendData():
 
 
 # test-------------------------------------------------------------------------
-sendData()
 
 # main-------------------------------------------------------------------------
 notification("Audiometer", "The addon is running", 5000)
@@ -196,13 +202,15 @@ def copyToUSBLogic():
         return
     usbFinded, pathUSB, usbName = findUSB()
     if usbFinded:
-        copied = dialogYesNoCopyFileDataToUSB("Audiometer", "Copiar los datos registrados en la USB " + usbName, pathUSB)
+        copied = dialogYesNoCopyFileDataToUSB("Audiometer", "Copiar los datos registrados en la USB " + usbName,
+                                              pathUSB)
         if copied:
             deleted = dialogYesNoRemovedFileData("Audiometer", "Eliminar los datos ya copiados")
             if deleted:
                 notification("Audiometer", "Datos copiados y eliminados", 5000)
             else:
                 notification("Audiometer", "Datos copiados", 5000)
+
 
 while False:
     if xbmc.Player().isPlaying():
