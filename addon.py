@@ -48,8 +48,13 @@ def dialogInput(tittle):
 # Data
 def readConfigs():
     global configPath
-    with open(configPath) as f:
-        return json.load(f)
+    try:
+        with open(configPath) as f:
+            return json.load(f)
+    except Exception as e:
+        notification("Audiometer", f"Error al leer configuraciones: {e}", 5000)
+        return {}
+
 
 
 def writeData(data):
@@ -155,11 +160,15 @@ def getTokenJWT():
         'Content-Type': 'application/json'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload)
-
-    if response.status_code == 200:
-        return response.json()['token']
-    else:
+    try:
+        response = requests.request("POST", url, headers=headers, data=payload)
+        if response.status_code == 200:
+            return response.json()['token']
+        else:
+            notification("Audiometer", f"Error al obtener token JWT: {response.status_code}", 5000)
+            return ''
+    except Exception as e:
+        notification("Audiometer", f"Error en la solicitud de JWT: {e}", 5000)
         return ''
 
 
