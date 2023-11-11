@@ -8,7 +8,7 @@ import shutil
 import uuid
 
 # globals
-configPath = '/home/davex/.kodi/addons/script.uclv.audience/config.json'
+configPath = '/Users/davidmigoya/Library/Application Support/Kodi/addons/script.uclv.audience/config.json'
 
 
 # View
@@ -224,7 +224,7 @@ def copyToUSBLogic():
                 notification("Audiometer", "Datos copiados", 5000)
 
 
-while False:
+while True:
     if xbmc.Player().isPlaying():
         flagSaveDone = False
         if name == '':
