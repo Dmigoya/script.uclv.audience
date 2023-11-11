@@ -247,7 +247,7 @@ while True:
             flagSaveDone = True
             xbmc.sleep(1000 * configs["sleep_time"])
             continue
-    pass
+    sendData()
 
 # duration = xbmc.getInfoLabel("Player.Time")
 # videoFormat = xbmc.getInfoLabel("Player.VideoCodec")
