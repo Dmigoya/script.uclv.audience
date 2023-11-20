@@ -1,1 +1,8 @@
-{"sleep_time": 2, "url_api": "http://localhost", "port_api": "9000", "max_space_kb": 1024, "master_path": "/home/davex/.kodi/addons/script.uclv.audience/", "data_name_file": "data.json"}
+{
+  "sleep_time": 2,
+  "url_api": "http://localhost",
+  "port_api": "9000",
+  "max_space_kb": 1024,
+  "master_path": "/Users/davidmigoya/Library/Application Support/Kodi/addons/script.uclv.audience/",
+  "data_name_file": "data.json"
+}
