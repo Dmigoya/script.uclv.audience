@@ -4,5 +4,8 @@
   "port_api": "9000",
   "max_space_kb": 1024,
   "master_path": "/Users/davidmigoya/Library/Application Support/Kodi/addons/script.uclv.audience/",
-  "data_name_file": "data.json"
+  "data_name_file": "data.json",
+  "isDebug": false,
+  "usbName": "1234",
+  "removeDataWhenCopyToUSB": false
 }

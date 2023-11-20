@@ -13,37 +13,45 @@ configPath = '/Users/davidmigoya/Library/Application Support/Kodi/addons/script.
 
 # View
 def notification(tittle, message, time):
-    dialog = xbmcgui.Dialog()
-    dialog.notification(tittle, message, xbmcgui.NOTIFICATION_INFO, time)
+    configs = readConfigs()
+    if configs['isDebug']:
+        dialog = xbmcgui.Dialog()
+        dialog.notification(tittle, message, xbmcgui.NOTIFICATION_INFO, time)
 
 
 def dialog(tittle, message):
-    dialog = xbmcgui.Dialog()
-    dialog.ok(tittle, message)
+    configs = readConfigs()
+    if configs['isDebug']:
+        dialog = xbmcgui.Dialog()
+        dialog.ok(tittle, message)
 
 
 def dialogYesNoCopyFileDataToUSB(tittle, message, pathUSB):
-    dialog = xbmcgui.Dialog()
-    isPresedYes = dialog.yesno(tittle, message)
-    if isPresedYes:
-        copyDataFile(pathUSB)
-        return True
+    configs = readConfigs()
+    if configs['isDebug']:
+        dialog = xbmcgui.Dialog()
+        isPresedYes = dialog.yesno(tittle, message)
+        if isPresedYes:
+            return copyDataFile(pathUSB)
+        else:
+            return False
     else:
-        return False
+        return copyDataFile(pathUSB)
 
 
 def dialogYesNoRemovedFileData(tittle, message):
-    dialog = xbmcgui.Dialog()
-    isPresedYes = dialog.yesno(tittle, message)
-    if isPresedYes:
-        removeDataFile()
-        return True
+    configs = readConfigs()
+    flag = False
+    if configs['isDebug']:
+        dialog = xbmcgui.Dialog()
+        flag = dialog.yesno(tittle, message)
     else:
-        return False
+        if configs['removeDataWhenCopyToUSB']:
+            flag = True
+    if flag:
+        removeDataFile()
+    return flag
 
-def dialogInput(tittle):
-    d = xbmcgui.Dialog()
-    return d.input(tittle)
 
 # Data
 def readConfigs():
@@ -54,7 +62,6 @@ def readConfigs():
     except Exception as e:
         notification("Audiometer", f"Error al leer configuraciones: {e}", 5000)
         return {}
-
 
 
 def writeData(data):
@@ -110,8 +117,17 @@ def existDataFile():
 
 def copyDataFile(pathEnd):
     configs = readConfigs()
-    pathIn = configs['master_path'] + configs['data_name_file']
-    shutil.copy(pathIn, pathEnd)
+    flag = False
+    if configs['isDebug']:
+        flag = True
+    else:
+        usbName = configs['usbName']
+        if pathEnd.split('/')[pathEnd.len() - 1] == usbName:
+            flag = True
+    if flag:
+        pathIn = configs['master_path'] + configs['data_name_file']
+        shutil.copy(pathIn, pathEnd)
+    return flag
 
 
 def isSpaceAvaiable():
