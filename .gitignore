@@ -1,5 +1,4 @@
 lib/
+.idea/
 .DS_Store
 data.json
-.idea/misc.xml
-.idea/script.uclv.audience.iml
