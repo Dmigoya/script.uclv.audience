@@ -236,6 +236,7 @@ def copyToUSBLogic():
             else:
                 notification("Audiometer", "Datos copiados", 5000)
 # test-------------------------------------------------------------------------
+copyToUSBLogic()
 # main-------------------------------------------------------------------------
 notification("Audiometer", "The addon is running", 5000)
 configs = readConfigs()
