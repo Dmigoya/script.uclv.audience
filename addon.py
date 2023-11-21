@@ -7,6 +7,7 @@ from datetime import datetime
 import shutil
 import uuid
 import subprocess
+import glob
 
 # globals
 configPath = '/Users/davidmigoya/Library/Application Support/Kodi/addons/script.uclv.audience/config.json'
@@ -115,6 +116,11 @@ def existDataFile():
     path = configs['master_path'] + configs['data_name_file']
     return os.path.exists(path)
 
+def existFile(dir, start_name):
+    regex = f"{dir}/{start_name}*"
+    files_found = glob.glob(regex)
+    return len(files_found)>0
+
 
 def copyDataFile(pathEnd):
     configs = readConfigs()
@@ -125,6 +131,8 @@ def copyDataFile(pathEnd):
         original_name = configs['data_name_file']
         base_name, extension = original_name.rsplit('.', 1)
         new_name = f"{base_name}_{uuid}_{current_date_time}.{extension}"
+        if existFile(pathEnd, f"{base_name}_{uuid}"):
+            return True
 
         pathIn = configs['master_path'] + original_name
         pathEndComplete = pathEnd + '/' + new_name
