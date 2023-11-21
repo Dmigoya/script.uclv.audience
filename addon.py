@@ -235,6 +235,7 @@ def copyToUSBLogic():
                 notification("Audiometer", "Datos copiados y eliminados", 5000)
             else:
                 notification("Audiometer", "Datos copiados", 5000)
+                
 # test-------------------------------------------------------------------------
 copyToUSBLogic()
 # main-------------------------------------------------------------------------
