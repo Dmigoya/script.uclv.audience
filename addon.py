@@ -171,7 +171,7 @@ def getTokenJWT():
 
     payload = json.dumps({
         "userName": configs['userName'],
-        "password":  configs['password']
+        "password": configs['password']
     })
     headers = {
         'Content-Type': 'application/json'
@@ -222,6 +222,7 @@ def sendData():
     except Exception as e:
         return False
 
+
 def copyToUSBLogic():
     if not existDataFile():
         return
@@ -235,7 +236,8 @@ def copyToUSBLogic():
                 notification("Audiometer", "Datos copiados y eliminados", 5000)
             else:
                 notification("Audiometer", "Datos copiados", 5000)
-                
+
+
 # test-------------------------------------------------------------------------
 copyToUSBLogic()
 # main-------------------------------------------------------------------------
@@ -244,7 +246,6 @@ configs = readConfigs()
 timeIn = datetime.now()
 flagSaveDone = True
 name = ''
-
 
 # logic
 while True:
