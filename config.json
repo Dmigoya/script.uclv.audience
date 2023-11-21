@@ -1,4 +1,6 @@
 {
+  "userName": "dmigoya@uclv.cu",
+  "password": "1234",
   "sleep_time": 2,
   "url_api": "http://localhost",
   "port_api": "9000",

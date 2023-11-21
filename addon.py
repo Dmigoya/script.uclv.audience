@@ -9,6 +9,7 @@ import uuid
 
 # globals
 configPath = '/Users/davidmigoya/Library/Application Support/Kodi/addons/script.uclv.audience/config.json'
+jwt = ''
 
 
 # View
@@ -169,8 +170,8 @@ def getTokenJWT():
     url = urlbase + "/api/v1/login"
 
     payload = json.dumps({
-        "userName": "dmigoya@uclv.cu",
-        "password": "1234"
+        "userName": configs['userName'],
+        "password":  configs['password']
     })
     headers = {
         'Content-Type': 'application/json'
@@ -195,22 +196,30 @@ def sendData():
     baseUrl = configs["url_api"] + ":" + configs["port_api"]
     url = baseUrl + "/api/v1/data/saveData"
     payload = readData()
-    token = getTokenJWT()
+    global jwt
+    token = jwt
     if token == '':
-        return False
-    else:
-        token = "Bearer " + token
+        token = getTokenJWT()
+        if token == '':
+            return False
+        else:
+            jwt = token
+    token = "Bearer " + token
 
     headers = {
         "Authorization": token,
         'Content-Type': 'application/json'}
 
-    response = requests.post(url, data=json.dumps(payload), headers=headers)
-
-    if response.status_code == 200:
-        removeDataFile()
-        return True
-    else:
+    try:
+        response = requests.post(url, data=json.dumps(payload), headers=headers)
+        if response.status_code == 200:
+            removeDataFile()
+            return True
+        else:
+            if response.text == 'Invalid token':
+                jwt = ''
+                sendData()
+    except Exception as e:
         return False
 
 
