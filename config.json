@@ -10,5 +10,5 @@
   "isDebug": false,
   "usbName": "Davex_2T",
   "removeDataWhenCopyToUSB": false,
-  "removeDataWhenSendToServer": false
+  "removeDataWhenSendToServer": true
 }
