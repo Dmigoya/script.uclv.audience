@@ -222,18 +222,6 @@ def sendData():
     except Exception as e:
         return False
 
-
-# test-------------------------------------------------------------------------
-
-# main-------------------------------------------------------------------------
-notification("Audiometer", "The addon is running", 5000)
-configs = readConfigs()
-timeIn = datetime.now()
-flagSaveDone = True
-name = ''
-
-
-# logic
 def copyToUSBLogic():
     if not existDataFile():
         return
@@ -247,8 +235,16 @@ def copyToUSBLogic():
                 notification("Audiometer", "Datos copiados y eliminados", 5000)
             else:
                 notification("Audiometer", "Datos copiados", 5000)
+# test-------------------------------------------------------------------------
+# main-------------------------------------------------------------------------
+notification("Audiometer", "The addon is running", 5000)
+configs = readConfigs()
+timeIn = datetime.now()
+flagSaveDone = True
+name = ''
 
 
+# logic
 while True:
     if xbmc.Player().isPlaying():
         flagSaveDone = False
