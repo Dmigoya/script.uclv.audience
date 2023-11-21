@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 import shutil
 import uuid
+import subprocess
 
 # globals
 configPath = '/Users/davidmigoya/Library/Application Support/Kodi/addons/script.uclv.audience/config.json'
@@ -47,8 +48,7 @@ def dialogYesNoRemovedFileData(tittle, message):
         dialog = xbmcgui.Dialog()
         flag = dialog.yesno(tittle, message)
     else:
-        if configs['removeDataWhenCopyToUSB']:
-            flag = True
+        flag = configs['removeDataWhenCopyToUSB']
     if flag:
         removeDataFile()
     return flag
@@ -118,17 +118,24 @@ def existDataFile():
 
 def copyDataFile(pathEnd):
     configs = readConfigs()
-    flag = False
-    if configs['isDebug']:
-        flag = True
-    else:
-        usbName = configs['usbName']
-        if pathEnd.split('/')[pathEnd.len() - 1] == usbName:
-            flag = True
-    if flag:
-        pathIn = configs['master_path'] + configs['data_name_file']
-        shutil.copy(pathIn, pathEnd)
-    return flag
+    try:
+        # Obtener la fecha y hora actual
+        current_date_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # Construir el nuevo nombre del archivo
+        original_name = configs['data_name_file']
+        base_name, extension = original_name.rsplit('.', 1)
+        new_name = f"{base_name}_{current_date_time}.{extension}"
+
+        # Rutas de origen y destino
+        pathIn = configs['master_path'] + original_name
+        pathEndComplete = pathEnd + '/' + new_name
+
+        # Copiar el archivo
+        shutil.copy(pathIn, pathEndComplete)
+        return True
+    except Exception as e:
+        return False
 
 
 def isSpaceAvaiable():
@@ -150,13 +157,15 @@ def isSpaceAvaiable():
 
 
 def findUSB():
-    folder_usb = "/media/" + os.getenv("USER")
-    files = os.listdir(folder_usb)
-    for file in files:
-        path = folder_usb + "/" + file
-        if os.path.ismount(path):
-            return True, (path + "/"), file
-    return False, '', ''
+    configs = readConfigs()
+    usbName = configs['usbName']
+    result = subprocess.run(['df'], capture_output=True, text=True)
+    lines = result.stdout.split('\n')
+    for line in lines:
+        parts = line.split()
+        if len(parts)>0 and '/' in parts[-1]  and usbName == parts[-1].split('/')[-1]:
+            return parts[-1]
+    return ''
 
 
 def getUUID():
@@ -226,20 +235,21 @@ def sendData():
 def copyToUSBLogic():
     if not existDataFile():
         return
-    usbFinded, pathUSB, usbName = findUSB()
-    if usbFinded:
-        copied = dialogYesNoCopyFileDataToUSB("Audiometer", "Copiar los datos registrados en la USB " + usbName,
-                                              pathUSB)
+    pathUSB = findUSB()
+    if pathUSB != '':
+        copied = dialogYesNoCopyFileDataToUSB("Audiometer", "Copiar los datos registrados en la USB ", pathUSB)
         if copied:
             deleted = dialogYesNoRemovedFileData("Audiometer", "Eliminar los datos ya copiados")
             if deleted:
                 notification("Audiometer", "Datos copiados y eliminados", 5000)
             else:
                 notification("Audiometer", "Datos copiados", 5000)
+        else:
+            notification("Audiometer", "Error al copiar los datos", 5000)
 
 
 # test-------------------------------------------------------------------------
-copyToUSBLogic()
+
 # main-------------------------------------------------------------------------
 notification("Audiometer", "The addon is running", 5000)
 configs = readConfigs()
