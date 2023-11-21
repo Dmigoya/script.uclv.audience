@@ -119,19 +119,16 @@ def existDataFile():
 def copyDataFile(pathEnd):
     configs = readConfigs()
     try:
-        # Obtener la fecha y hora actual
         current_date_time = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        # Construir el nuevo nombre del archivo
+        uuid = getUUID()
         original_name = configs['data_name_file']
         base_name, extension = original_name.rsplit('.', 1)
-        new_name = f"{base_name}_{current_date_time}.{extension}"
+        new_name = f"{base_name}_{uuid}_{current_date_time}.{extension}"
 
-        # Rutas de origen y destino
         pathIn = configs['master_path'] + original_name
         pathEndComplete = pathEnd + '/' + new_name
 
-        # Copiar el archivo
         shutil.copy(pathIn, pathEndComplete)
         return True
     except Exception as e:
@@ -222,7 +219,8 @@ def sendData():
     try:
         response = requests.post(url, data=json.dumps(payload), headers=headers)
         if response.status_code == 200:
-            removeDataFile()
+            if configs['removeDataWhenSendToServer']:
+                removeDataFile()
             return True
         else:
             if response.text == 'Invalid token':
@@ -281,7 +279,8 @@ while True:
             flagSaveDone = True
             xbmc.sleep(1000 * configs["sleep_time"])
             continue
-    sendData()
+    if not sendData():
+        copyToUSBLogic()
 
 # duration = xbmc.getInfoLabel("Player.Time")
 # videoFormat = xbmc.getInfoLabel("Player.VideoCodec")

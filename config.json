@@ -9,5 +9,6 @@
   "data_name_file": "data.json",
   "isDebug": false,
   "usbName": "Davex_2T",
-  "removeDataWhenCopyToUSB": false
+  "removeDataWhenCopyToUSB": false,
+  "removeDataWhenSendToServer": false
 }
