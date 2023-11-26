@@ -7,25 +7,23 @@
   <!--<extension point="xbmc.service" library="./addon.py"/>-->
   <extension point="xbmc.python.script" library="./addon.py"/>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Your add-on's summary</summary>
-    <description lang="en_GB">Your add-on's description</description>
+    <summary lang="en_GB">Una herramienta de medición de audiencia para Kodi, diseñada para integrarse con cajas decodificadoras, ofreciendo análisis de datos de visualización en tiempo real.</summary>
+    <description lang="en_GB">Este add-on para Kodi transforma la caja decodificadora en un potente instrumento de medición de audiencias, permitiendo a las emisoras y creadores de contenido comprender mejor a su audiencia. Funciona recopilando datos de visualización en tiempo real, como preferencias de programas, duración de la visualización y patrones de comportamiento. Su diseño permite una integración fluida y discreta con la caja decodificadora, asegurando que la experiencia del usuario no se vea afectada. Además, es capaz de procesar y transmitir datos de manera eficiente, lo que lo convierte en una herramienta valiosa para análisis de audiencia y planificación de programación en el contexto de la televisión digital moderna.</description>
     <disclaimer lang="en_GB"></disclaimer>
-    <language>en</language> <!-- language of the content the add-on provides, omit if the add-on does not provide any content -->
+    <language>es</language>
     <platform>all</platform>
     <license>GPL-2.0-or-later</license>
-    <forum>https://forum.kodi.tv/showthread.php?tid=xxxx</forum> <!-- may be omitted -->
-    <website>http://myplugin.com</website> <!-- URL of the website that supplies the content, or the website for your plugin; may be omitted. -->
+    <forum>https://forum.kodi.tv/showthread.php?tid=xxxx</forum>
+    <website>https://www.uclv.edu.cu/</website>
     <email>you@youremail.com</email> <!-- may be omitted -->
     <source>http://github.com/you/plugin.addon.id</source>
-    <news>v1.2.3 (01/02/2013)
-      [new] some new feature
-      [fix] some fix
+    <news>v1.0.0
     </news>
     <assets>
-        <icon>resources/icon.png</icon>
-        <fanart>resources/fanart.jpg</fanart>
-        <banner></banner> <!-- optional -->
-        <clearlogo>resources/icon.png</clearlogo> <!-- optional -->
+        <icon>resources/i.png</icon>
+        <fanart>resources/fanart.png</fanart>
+        <banner>resources/fanart.png</banner> <!-- optional -->
+        <clearlogo>resources/i.png</clearlogo> <!-- optional -->
         <screenshot></screenshot> <!-- optional, max. 10 -->
     </assets>
   </extension>
