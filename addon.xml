@@ -4,8 +4,8 @@
     <import addon="xbmc.python" version="2.25.0"/>
     <import addon="script.module.requests" version="2.27.1"/>
   </requires>
-  <!--<extension point="xbmc.service" library="./addon.py"/>-->
-  <extension point="xbmc.python.script" library="./addon.py"/>
+  <extension point="xbmc.service" library="./addon.py"/>
+  <!--<extension point="xbmc.python.script" library="./addon.py"/>-->
   <extension point="xbmc.addon.metadata">
     <summary lang="en_GB">Herramienta de medición de audiencia para Kodi.</summary>
     <description lang="en_GB">Este add-on para Kodi transforma la caja decodificadora en un instrumento de medición de audiencias, permitiendo al SNTVC comprender mejor a su audiencia. Funciona recopilando datos de visualización en tiempo real, como preferencias de programas, duración de la visualización y patrones de comportamiento. Su diseño permite una integración fluida y discreta con la caja decodificadora, asegurando que la experiencia del usuario no se vea afectada. Además, es capaz de procesar y transmitir datos de manera eficiente, lo que lo convierte en una herramienta valiosa para análisis de audiencia y planificación de programación en el contexto de la televisión digital moderna.</description>

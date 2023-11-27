@@ -117,7 +117,7 @@ def existDataFile():
     return os.path.exists(path)
 
 def existFile(dir, start_name):
-    regex = "{}{}*".format(dir, start_name)
+    regex = "{}{}*".format(dir+'/', start_name)
     files_found = glob.glob(regex)
     return len(files_found) > 0
 
