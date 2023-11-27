@@ -15,26 +15,26 @@ jwt = ''
 
 
 # View
-def notification(tittle, message, time):
+def notification(title, message, time):
     configs = readConfigs()
     if configs['isDebug']:
         dialog = xbmcgui.Dialog()
-        dialog.notification(tittle, message, xbmcgui.NOTIFICATION_INFO, time)
+        dialog.notification(title, message, xbmcgui.NOTIFICATION_INFO, time)
 
 
-def dialog(tittle, message):
+def dialog(title, message):
     configs = readConfigs()
     if configs['isDebug']:
         dialog = xbmcgui.Dialog()
-        dialog.ok(tittle, message)
+        dialog.ok(title, message)
 
 
-def dialogYesNoCopyFileDataToUSB(tittle, message, pathUSB):
+def dialogYesNoCopyFileDataToUSB(title, message, pathUSB):
     configs = readConfigs()
     if configs['isDebug']:
         dialog = xbmcgui.Dialog()
-        isPresedYes = dialog.yesno(tittle, message)
-        if isPresedYes:
+        isPressedYes = dialog.yesno(title, message)
+        if isPressedYes:
             return copyDataFile(pathUSB)
         else:
             return False
@@ -42,12 +42,12 @@ def dialogYesNoCopyFileDataToUSB(tittle, message, pathUSB):
         return copyDataFile(pathUSB)
 
 
-def dialogYesNoRemovedFileData(tittle, message):
+def dialogYesNoRemovedFileData(title, message):
     configs = readConfigs()
     flag = False
     if configs['isDebug']:
         dialog = xbmcgui.Dialog()
-        flag = dialog.yesno(tittle, message)
+        flag = dialog.yesno(title, message)
     else:
         flag = configs['removeDataWhenCopyToUSB']
     if flag:
@@ -61,19 +61,19 @@ def readConfigs():
     try:
         with open(configPath) as f:
             return json.load(f)
-    except Exception as e:
-        notification("Audiometer", f"Error al leer configuraciones: {e}", 5000)
+    except Exception, e:
+        notification("Audiometer", "Error al leer configuraciones: {}".format(e), 5000)
         return {}
 
 
 def writeData(data):
-    if not isSpaceAvaiable():
+    if not isSpaceAvailable():
         notification('Audiometer', 'No hay espacio en el disco', 10000)
         return
     configs = readConfigs()
     path = configs['master_path'] + configs['data_name_file']
     fileJson = readData()
-    if fileJson != None and 'data' in fileJson:
+    if fileJson is not None and 'data' in fileJson:
         fileJson['data'].append(data)
     else:
         fileJson = {'data': []}
@@ -89,7 +89,7 @@ def readData():
     try:
         with open(path) as f:
             return json.load(f)
-    except FileNotFoundError:
+    except IOError, e:
         data = {}
         with open(path, 'w') as f:
             json.dump(data, f)
@@ -117,9 +117,9 @@ def existDataFile():
     return os.path.exists(path)
 
 def existFile(dir, start_name):
-    regex = f"{dir}/{start_name}*"
+    regex = "{}{}*".format(dir, start_name)
     files_found = glob.glob(regex)
-    return len(files_found)>0
+    return len(files_found) > 0
 
 
 def copyDataFile(pathEnd):
@@ -127,11 +127,11 @@ def copyDataFile(pathEnd):
     try:
         current_date_time = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        uuid = getUUID()
+        uuid_str = getUUID()
         original_name = configs['data_name_file']
         base_name, extension = original_name.rsplit('.', 1)
-        new_name = f"{base_name}_{uuid}_{current_date_time}.{extension}"
-        if existFile(pathEnd, f"{base_name}_{uuid}"):
+        new_name = "{}_{}_{}.{}".format(base_name, uuid_str, current_date_time, extension)
+        if existFile(pathEnd, "{}_{}".format(base_name, uuid_str)):
             return True
 
         pathIn = configs['master_path'] + original_name
@@ -139,11 +139,11 @@ def copyDataFile(pathEnd):
 
         shutil.copy(pathIn, pathEndComplete)
         return True
-    except Exception as e:
+    except Exception, e:
         return False
 
 
-def isSpaceAvaiable():
+def isSpaceAvailable():
     configs = readConfigs()
     path = configs['master_path']
     dataFile = configs['data_name_file']
@@ -152,7 +152,7 @@ def isSpaceAvaiable():
         freeSpace = statvfs.f_bavail * statvfs.f_frsize
         if os.path.exists(path + dataFile):
             sizeFile = os.path.getsize(path + dataFile)
-            freeSpace = freeSpace - sizeFile
+            freeSpace -= sizeFile
         if freeSpace > configs["max_space_kb"]:
             return True
         else:
@@ -164,11 +164,12 @@ def isSpaceAvaiable():
 def findUSB():
     configs = readConfigs()
     usbName = configs['usbName']
-    result = subprocess.run(['df'], capture_output=True, text=True)
-    lines = result.stdout.split('\n')
+    result = subprocess.Popen(['df'], stdout=subprocess.PIPE)
+    stdout, _ = result.communicate()
+    lines = stdout.split('\n')
     for line in lines:
         parts = line.split()
-        if len(parts)>0 and '/' in parts[-1]  and usbName == parts[-1].split('/')[-1]:
+        if len(parts) > 0 and '/' in parts[-1] and usbName == parts[-1].split('/')[-1]:
             return parts[-1]
     return ''
 
@@ -196,10 +197,10 @@ def getTokenJWT():
         if response.status_code == 200:
             return response.json()['token']
         else:
-            notification("Audiometer", f"Error al obtener token JWT: {response.status_code}", 5000)
+            notification("Audiometer", "Error al obtener token JWT: {}".format(response.status_code), 5000)
             return ''
-    except Exception as e:
-        notification("Audiometer", f"Error en la solicitud de JWT: {e}", 5000)
+    except Exception, e:
+        notification("Audiometer", "Error en la solicitud de JWT: {}".format(e), 5000)
         return ''
 
 
@@ -234,7 +235,7 @@ def sendData():
             if response.text == 'Invalid token':
                 jwt = ''
                 sendData()
-    except Exception as e:
+    except Exception, e:
         return False
 
 
@@ -243,7 +244,7 @@ def copyToUSBLogic():
         return
     pathUSB = findUSB()
     if pathUSB != '':
-        copied = dialogYesNoCopyFileDataToUSB("Audiometer", "Copiar los datos registrados en la USB ", pathUSB)
+        copied = dialogYesNoCopyFileDataToUSB("Audiometer", "Copiar los datos registrados en la USB", pathUSB)
         if copied:
             deleted = dialogYesNoRemovedFileData("Audiometer", "Eliminar los datos ya copiados")
             if deleted:
