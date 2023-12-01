@@ -1,5 +1,6 @@
 import xbmc
 import xbmcgui
+import xbmcaddon
 import json
 import requests
 import os
@@ -10,9 +11,18 @@ import subprocess
 import glob
 
 # globals
-configPath = '/Users/davidmigoya/Library/Application Support/Kodi/addons/script.uclv.audience/config.json'
+master_path = xbmcaddon.Addon().getAddonInfo('path')
 jwt = ''
 
+def readConfigs():
+    global master_path
+    configPath = os.path.join(master_path, 'config.json')
+    try:
+        with open(configPath) as f:
+            return json.load(f)
+    except Exception, e:
+        notification("Audiometer", "Error al leer configuraciones: {}".format(e), 5000)
+        return {}
 
 # View
 def notification(title, message, time):
@@ -56,22 +66,16 @@ def dialogYesNoRemovedFileData(title, message):
 
 
 # Data
-def readConfigs():
-    global configPath
-    try:
-        with open(configPath) as f:
-            return json.load(f)
-    except Exception, e:
-        notification("Audiometer", "Error al leer configuraciones: {}".format(e), 5000)
-        return {}
-
-
 def writeData(data):
+    global master_path
     if not isSpaceAvailable():
         notification('Audiometer', 'No hay espacio en el disco', 10000)
         return
     configs = readConfigs()
-    path = configs['master_path'] + configs['data_name_file']
+    path = os.path.join(master_path, configs['data_name_file'])
+
+    dialog('writeData', path)
+
     fileJson = readData()
     if fileJson is not None and 'data' in fileJson:
         fileJson['data'].append(data)
@@ -84,8 +88,9 @@ def writeData(data):
 
 
 def readData():
+    global master_path
     configs = readConfigs()
-    path = configs['master_path'] + configs['data_name_file']
+    path = os.path.join(master_path, configs['data_name_file'])
     try:
         with open(path) as f:
             return json.load(f)
@@ -105,15 +110,17 @@ def getModelDataToSave(name, timeIn):
 
 
 def removeDataFile():
+    global master_path
     configs = readConfigs()
-    path = configs['master_path'] + configs['data_name_file']
+    path = os.path.join(master_path, configs['data_name_file'])
     if os.path.exists(path):
         os.remove(path)
 
 
 def existDataFile():
+    global master_path
     configs = readConfigs()
-    path = configs['master_path'] + configs['data_name_file']
+    path = os.path.join(master_path, configs['data_name_file'])
     return os.path.exists(path)
 
 def existFile(dir, start_name):
@@ -123,6 +130,7 @@ def existFile(dir, start_name):
 
 
 def copyDataFile(pathEnd):
+    global master_path
     configs = readConfigs()
     try:
         current_date_time = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -134,9 +142,8 @@ def copyDataFile(pathEnd):
         if existFile(pathEnd, "{}_{}".format(base_name, uuid_str)):
             return True
 
-        pathIn = configs['master_path'] + original_name
-        pathEndComplete = pathEnd + '/' + new_name
-
+        pathIn = os.path.join(master_path, original_name)
+        pathEndComplete = os.path.join(pathEnd, new_name)
         shutil.copy(pathIn, pathEndComplete)
         return True
     except Exception, e:
@@ -144,14 +151,16 @@ def copyDataFile(pathEnd):
 
 
 def isSpaceAvailable():
+    global master_path
     configs = readConfigs()
-    path = configs['master_path']
+    path = master_path
     dataFile = configs['data_name_file']
+    pathPlusDataFile = os.path.join(master_path, dataFile)
     if os.path.exists(path):
         statvfs = os.statvfs(path)
         freeSpace = statvfs.f_bavail * statvfs.f_frsize
-        if os.path.exists(path + dataFile):
-            sizeFile = os.path.getsize(path + dataFile)
+        if os.path.exists(pathPlusDataFile):
+            sizeFile = os.path.getsize(pathPlusDataFile)
             freeSpace -= sizeFile
         if freeSpace > configs["max_space_kb"]:
             return True
@@ -200,7 +209,6 @@ def getTokenJWT():
             notification("Audiometer", "Error al obtener token JWT: {}".format(response.status_code), 5000)
             return ''
     except Exception, e:
-        notification("Audiometer", "Error en la solicitud de JWT: {}".format(e), 5000)
         return ''
 
 

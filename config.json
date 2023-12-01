@@ -5,9 +5,8 @@
   "url_api": "http://localhost",
   "port_api": "9000",
   "max_space_kb": 1024,
-  "master_path": "/Users/davidmigoya/Library/Application Support/Kodi/addons/script.uclv.audience/",
   "data_name_file": "data.json",
-  "isDebug": false,
+  "isDebug": true,
   "usbName": "Davex_2T",
   "removeDataWhenCopyToUSB": false,
   "removeDataWhenSendToServer": true
