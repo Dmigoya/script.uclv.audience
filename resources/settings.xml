@@ -1,0 +1,20 @@
+<settings>
+    <category label="Servidor">
+        <setting id="userName" type="text" label="Nombre de usuario" default="dmigoya@uclv.cu"/>
+        <setting id="password" type="text" label="Contraseña" default="1234"/>
+        <setting id="url_api" type="text" label="Dirección del servidor" default="http://localhost"/>
+        <setting id="port_api" type="text" label="Puerto del servidor" default="9000"/>
+    </category>
+
+    <category label="Control general">
+        <setting id="sleep_time" type="number" label="Tiempo de espera para el ciclo" default="2"/>
+        <setting id="max_space_kb" type="number" label="Máximo espacio para guardar nuevo registro" default="512"/>
+        <setting id="data_name_file" type="text" label="Nombre de archivo de datos" default="data.json"/>
+        <setting id="usbName" type="text" label="Nombre de USB" default="Davex_2T"/>
+        <setting id="isDebug" type="bool" label="Modo Debug" default="false"/>
+        <setting id="removeDataWhenCopyToUSB" type="bool" label="Eliminar datos al copiar a USB" default="false"/>
+        <setting id="removeDataWhenSendToServer" type="bool" label="Eliminar datos al enviar al servidor" default="true"/>
+    </category>
+
+</settings>
+

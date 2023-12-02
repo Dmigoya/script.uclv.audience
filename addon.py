@@ -11,37 +11,34 @@ import subprocess
 import glob
 
 # globals
-master_path = xbmcaddon.Addon().getAddonInfo('path')
+addon = xbmcaddon.Addon()
 jwt = ''
 
-def readConfigs():
-    global master_path
-    configPath = os.path.join(master_path, 'config.json')
-    try:
-        with open(configPath) as f:
-            return json.load(f)
-    except Exception, e:
-        notification("Audiometer", "Error al leer configuraciones: {}".format(e), 5000)
-        return {}
+# Configs
+def getSetting(key):
+    return addon.getSetting(key)
+
+def getBoolSetting(key):
+    return addon.getSetting(key).lower() == "true"
+
+def getIntSetting(key):
+    return int(addon.getSetting(key))
 
 # View
 def notification(title, message, time):
-    configs = readConfigs()
-    if configs['isDebug']:
+    if getBoolSetting('isDebug'):
         dialog = xbmcgui.Dialog()
         dialog.notification(title, message, xbmcgui.NOTIFICATION_INFO, time)
 
 
 def dialog(title, message):
-    configs = readConfigs()
-    if configs['isDebug']:
+    if getBoolSetting('isDebug'):
         dialog = xbmcgui.Dialog()
         dialog.ok(title, message)
 
 
 def dialogYesNoCopyFileDataToUSB(title, message, pathUSB):
-    configs = readConfigs()
-    if configs['isDebug']:
+    if getBoolSetting('isDebug'):
         dialog = xbmcgui.Dialog()
         isPressedYes = dialog.yesno(title, message)
         if isPressedYes:
@@ -53,13 +50,12 @@ def dialogYesNoCopyFileDataToUSB(title, message, pathUSB):
 
 
 def dialogYesNoRemovedFileData(title, message):
-    configs = readConfigs()
     flag = False
-    if configs['isDebug']:
+    if getBoolSetting('isDebug'):
         dialog = xbmcgui.Dialog()
         flag = dialog.yesno(title, message)
     else:
-        flag = configs['removeDataWhenCopyToUSB']
+        flag = getBoolSetting('removeDataWhenCopyToUSB')
     if flag:
         removeDataFile()
     return flag
@@ -67,14 +63,10 @@ def dialogYesNoRemovedFileData(title, message):
 
 # Data
 def writeData(data):
-    global master_path
     if not isSpaceAvailable():
         notification('Audiometer', 'No hay espacio en el disco', 10000)
         return
-    configs = readConfigs()
-    path = os.path.join(master_path, configs['data_name_file'])
-
-    dialog('writeData', path)
+    path = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), getSetting('data_name_file'))
 
     fileJson = readData()
     if fileJson is not None and 'data' in fileJson:
@@ -88,9 +80,7 @@ def writeData(data):
 
 
 def readData():
-    global master_path
-    configs = readConfigs()
-    path = os.path.join(master_path, configs['data_name_file'])
+    path = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), getSetting('data_name_file'))
     try:
         with open(path) as f:
             return json.load(f)
@@ -110,17 +100,13 @@ def getModelDataToSave(name, timeIn):
 
 
 def removeDataFile():
-    global master_path
-    configs = readConfigs()
-    path = os.path.join(master_path, configs['data_name_file'])
+    path = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), getSetting('data_name_file'))
     if os.path.exists(path):
         os.remove(path)
 
 
 def existDataFile():
-    global master_path
-    configs = readConfigs()
-    path = os.path.join(master_path, configs['data_name_file'])
+    path = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), getSetting('data_name_file'))
     return os.path.exists(path)
 
 def existFile(dir, start_name):
@@ -130,19 +116,17 @@ def existFile(dir, start_name):
 
 
 def copyDataFile(pathEnd):
-    global master_path
-    configs = readConfigs()
     try:
         current_date_time = datetime.now().strftime("%Y%m%d_%H%M%S")
 
         uuid_str = getUUID()
-        original_name = configs['data_name_file']
+        original_name = getSetting('data_name_file')
         base_name, extension = original_name.rsplit('.', 1)
         new_name = "{}_{}_{}.{}".format(base_name, uuid_str, current_date_time, extension)
         if existFile(pathEnd, "{}_{}".format(base_name, uuid_str)):
             return True
 
-        pathIn = os.path.join(master_path, original_name)
+        pathIn = os.path.join(xbmcaddon.Addon().getAddonInfo('path'), original_name)
         pathEndComplete = os.path.join(pathEnd, new_name)
         shutil.copy(pathIn, pathEndComplete)
         return True
@@ -151,18 +135,16 @@ def copyDataFile(pathEnd):
 
 
 def isSpaceAvailable():
-    global master_path
-    configs = readConfigs()
-    path = master_path
-    dataFile = configs['data_name_file']
-    pathPlusDataFile = os.path.join(master_path, dataFile)
+    path = xbmcaddon.Addon().getAddonInfo('path')
+    dataFile = getSetting('data_name_file')
+    pathPlusDataFile = os.path.join(path, dataFile)
     if os.path.exists(path):
         statvfs = os.statvfs(path)
         freeSpace = statvfs.f_bavail * statvfs.f_frsize
         if os.path.exists(pathPlusDataFile):
             sizeFile = os.path.getsize(pathPlusDataFile)
             freeSpace -= sizeFile
-        if freeSpace > configs["max_space_kb"]:
+        if freeSpace > getIntSetting("max_space_kb"):
             return True
         else:
             return False
@@ -171,8 +153,7 @@ def isSpaceAvailable():
 
 
 def findUSB():
-    configs = readConfigs()
-    usbName = configs['usbName']
+    usbName = getSetting('usbName')
     result = subprocess.Popen(['df'], stdout=subprocess.PIPE)
     stdout, _ = result.communicate()
     lines = stdout.split('\n')
@@ -189,13 +170,12 @@ def getUUID():
 
 # API
 def getTokenJWT():
-    configs = readConfigs()
-    urlbase = configs["url_api"] + ":" + configs["port_api"]
+    urlbase = getSetting("url_api") + ":" + getSetting("port_api")
     url = urlbase + "/api/v1/login"
 
     payload = json.dumps({
-        "userName": configs['userName'],
-        "password": configs['password']
+        "userName": getSetting('userName'),
+        "password": getSetting('password')
     })
     headers = {
         'Content-Type': 'application/json'
@@ -215,8 +195,7 @@ def getTokenJWT():
 def sendData():
     if not existDataFile():
         return True
-    configs = readConfigs()
-    baseUrl = configs["url_api"] + ":" + configs["port_api"]
+    baseUrl = getSetting("url_api") + ":" + getSetting("port_api")
     url = baseUrl + "/api/v1/data/saveData"
     payload = readData()
     global jwt
@@ -236,7 +215,7 @@ def sendData():
     try:
         response = requests.post(url, data=json.dumps(payload), headers=headers)
         if response.status_code == 200:
-            if configs['removeDataWhenSendToServer']:
+            if getBoolSetting('removeDataWhenSendToServer'):
                 removeDataFile()
             return True
         else:
@@ -267,26 +246,26 @@ def copyToUSBLogic():
 
 # main-------------------------------------------------------------------------
 notification("Audiometer", "The addon is running", 5000)
-configs = readConfigs()
 timeIn = datetime.now()
 flagSaveDone = True
 name = ''
 
 # logic
 while True:
+    sleep_time = getIntSetting("sleep_time")
     if xbmc.Player().isPlaying():
         flagSaveDone = False
         if name == '':
             name = xbmc.getInfoLabel("Player.Title")
             timeIn = datetime.now()
-            xbmc.sleep(1000 * configs["sleep_time"])
+            xbmc.sleep(1000 * sleep_time)
             continue
         if xbmc.getInfoLabel("Player.Title") != name:
             data = getModelDataToSave(name, timeIn)
             writeData(data)
             name = xbmc.getInfoLabel("Player.Title")
             timeIn = datetime.now()
-            xbmc.sleep(1000 * configs["sleep_time"])
+            xbmc.sleep(1000 * sleep_time)
             continue
     else:
         if not flagSaveDone:
@@ -294,7 +273,7 @@ while True:
             writeData(data)
             name = ''
             flagSaveDone = True
-            xbmc.sleep(1000 * configs["sleep_time"])
+            xbmc.sleep(1000 * sleep_time)
             continue
     if not sendData():
         copyToUSBLogic()
